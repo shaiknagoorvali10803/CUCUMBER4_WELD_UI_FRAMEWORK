@@ -121,7 +121,6 @@ public class WebDriverProvider {
   private static WebDriver generateChromeWebDriver(boolean headless) {
     ChromeOptions chromeOptions = new ChromeOptions();
     chromeOptions.setHeadless(headless);
-    // chromeOptions.addArguments("--whitelist-ip *");
     chromeOptions.addArguments("--proxy-server='direct://'");
     chromeOptions.addArguments("--proxy-bypass-list=*");
     chromeOptions.addArguments("--ignore-certificate-errors");
@@ -131,6 +130,7 @@ public class WebDriverProvider {
     chromeOptions.addArguments("start-maximized");
     chromeOptions.addArguments("--incognito");
     chromeOptions.addArguments("--remote-allow-origins=*");
+    chromeOptions.addArguments("--disable-notifications");
     DesiredCapabilities capabilities = new DesiredCapabilities();
     capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
 
@@ -139,8 +139,9 @@ public class WebDriverProvider {
     HashMap<String, Object> chromePrefs = new HashMap<>();
     chromePrefs.put("profile.default_content_settings.popups", 0);
     chromePrefs.put("download.default_directory", downloadFilepath);
+    chromePrefs.put("safebrowsing_for_trusted_sources_enabled", false);
+    chromePrefs.put("safebrowsing.enabled", false);
     chromeOptions.setExperimentalOption("prefs", chromePrefs);
-
     if (BooleanUtils.toBoolean(System.getProperty("buildToolRun"))) {
       try {
         return new RemoteWebDriver(new URL(" http://localhost:4444/wd/hub"), chromeOptions);
@@ -148,7 +149,6 @@ public class WebDriverProvider {
         LOGGER.info("Given remote web driver url is wrong");
       }
     }
-
     return new ChromeDriver(chromeOptions);
   }
 
@@ -159,12 +159,12 @@ public class WebDriverProvider {
     edgeOptions.addArguments("--proxy-server='direct://'");
     edgeOptions.addArguments("--proxy-bypass-list=*");
     edgeOptions.addArguments("--ignore-certificate-errors");
+    //edgeOptions.addArguments("--headless");
     edgeOptions.setPageLoadStrategy(PageLoadStrategy.EAGER);
 
     // to launch chrome in incognito mode
     edgeOptions.addArguments("start-maximized");
-    edgeOptions.addArguments("--incognito");
-    edgeOptions.addArguments("--remote-allow-origins=*");
+    edgeOptions.addArguments("-inprivate");
     DesiredCapabilities capabilities = new DesiredCapabilities();
     capabilities.setCapability(ChromeOptions.CAPABILITY, edgeOptions);
 
@@ -174,7 +174,6 @@ public class WebDriverProvider {
     edgePrefs.put("profile.default_content_settings.popups", 0);
     edgePrefs.put("download.default_directory", downloadFilepath);
     edgeOptions.setExperimentalOption("prefs", edgePrefs);
-
     if (BooleanUtils.toBoolean(System.getProperty("buildToolRun"))) {
       try {
         return new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), edgeOptions);
@@ -182,7 +181,6 @@ public class WebDriverProvider {
         LOGGER.info("Given remote web driver url is wrong");
       }
     }
-
     return new EdgeDriver(edgeOptions);
   }
 
@@ -208,7 +206,7 @@ public class WebDriverProvider {
 
     // to launch chrome in incognito mode
     firefoxOptions.addArguments("start-maximized");
-    firefoxOptions.addArguments("--incognito");
+    firefoxOptions.addArguments("--private");
     if (BooleanUtils.toBoolean(System.getProperty("buildToolRun"))) {
       try {
         return new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), firefoxOptions);

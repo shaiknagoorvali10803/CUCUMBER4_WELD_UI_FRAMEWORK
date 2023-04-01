@@ -1,23 +1,17 @@
 package StepDefinitions;
 
 import Utils.ScenarioContext;
-import Utils.SeleniumUtil;
 import Utils.WebDriverProvider;
-import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.Assert;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import pageActions.ForgotPasswordActions;
 import pageActions.HomePageActions;
 import pageActions.LoginPageActions;
 
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import java.io.IOException;
-import java.sql.SQLOutput;
 
 public class LoginPageDefinitions {
 

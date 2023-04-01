@@ -33,14 +33,14 @@ import java.util.Date;
 import java.util.*;
 import java.util.logging.Level;
 
-public class SeleniumUtil {
+public class SeleniumUtil_New {
 
     private static final String SPINNER_XPATH = "//app-block-ui/div/p-blockui";
     public static final String ERROR_MSG = "Some error has occurred while performing operation::{}";
     public static final String IS_ENTERED = " is entered";
     public static final String AND_PASSWORD = " and Password: ";
     public static final String USERNAME = "Username: ";
-    private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumUtil.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumUtil_New.class);
     public static final int DRIVER_WAIT_TIME_IN_SECS = 120;
     private static final String DROPDOWN_ITEM_SELECTOR_IN_OVERLAY = "//ul/li[*]/span[text()='%s']";
     private static final String DROPDOWN_PARTIAL_MATCH_ITEM_SELECTOR_IN_OVERLAY = "//ul/li[*]/span[contains(text(),'%s')]";
@@ -58,7 +58,7 @@ public class SeleniumUtil {
 
     private boolean isCustomWait = false;
 
-    private SeleniumUtil() {
+    private SeleniumUtil_New() {
     }
 
     /**
@@ -748,7 +748,7 @@ public class SeleniumUtil {
      * Is Anchor present
      */
     public static boolean isAnchorPresent(final WebDriver driver, final String text) {
-        return SeleniumUtil.isElementPresent(driver, "//a[contains(text(),'" + text + "')]");
+        return SeleniumUtil_New.isElementPresent(driver, "//a[contains(text(),'" + text + "')]");
     }
 
     /**
@@ -1002,7 +1002,7 @@ public class SeleniumUtil {
      * is form control input field filled and valid
      */
     public static boolean isFormControlInputFieldFilledAndValid(final WebDriver driver, final WebElement webElement) {
-        final String fieldCSS = SeleniumUtil.getElementsCSS(driver, webElement, "tsFailedPaymentOopsImage");
+        final String fieldCSS = SeleniumUtil_New.getElementsCSS(driver, webElement, "tsFailedPaymentOopsImage");
         return fieldCSS.contains("ui-state-filled") && !fieldCSS.contains("ng-invalid");
     }
 
