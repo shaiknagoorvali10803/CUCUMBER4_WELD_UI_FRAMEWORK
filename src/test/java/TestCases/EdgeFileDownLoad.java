@@ -40,7 +40,7 @@ public class EdgeFileDownLoad {
         edgeOptions.setExperimentalOption("prefs", edgePrefs);
         WebDriver driver = new EdgeDriver(edgeOptions);
         driver.get("http://www.seleniumhq.org/download/");
-        SeleniumUtil.waitForElement(driver, driver.findElement(By.linkText("32 bit Windows IE")));
+        SeleniumUtil.waitUntilClickByElement(driver, driver.findElement(By.linkText("32 bit Windows IE")));
         driver.findElement(By.linkText("32 bit Windows IE")).click();
         SeleniumUtil.waitByTime(5000);
         driver.close();

@@ -25,7 +25,7 @@ public class HomePageActions {
 
     public String getHomePageText() {
         System.out.println("HomePage Text is : " + SeleniumUtil.getValueByElement(driverProvider.getInstance(), homePageLocators.homePageUserName));
-        SeleniumUtil.waitForElement(driverProvider.getInstance(), homePageLocators.homePageUserName, 30);
+        SeleniumUtil.waitUntilVisibleByElementByTIme(driverProvider.getInstance(), homePageLocators.homePageUserName, 30);
         return homePageLocators.homePageUserName.getText();
     }
 

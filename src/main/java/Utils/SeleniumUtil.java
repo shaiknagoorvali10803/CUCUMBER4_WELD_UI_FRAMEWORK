@@ -363,7 +363,7 @@ public class SeleniumUtil {
      * Passing Element as String
      */
     public static void clickElementByID(final WebDriver driver, final String elementID) {
-        waitForElementById(driver, elementID);
+        waitUntilClickById(driver, elementID);
         scrollToElement(driver, driver.findElement(By.id(elementID)));
         highLighterMethod(driver, driver.findElement(By.id(elementID)));
         driver.findElement(By.id(elementID)).click();
@@ -376,7 +376,7 @@ public class SeleniumUtil {
      */
     public static void clickElementbyXPath(final WebDriver driver, final String elementID) {
         try {
-            waitForElementByXpath(driver, elementID);
+            waitUntilClickByXpath(driver, elementID);
             scrollToElement(driver, driver.findElement(By.xpath(elementID)));
             driver.findElement(By.xpath(elementID)).click();
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -392,7 +392,7 @@ public class SeleniumUtil {
      */
     public static void clickElementbyWebElement(final WebDriver driver, final WebElement elementID) {
         try {
-            waitForElementByElement(driver, elementID);
+            waitUntilClickByElement(driver, elementID);
             scrollToElement(driver, elementID);
             elementID.sendKeys("");
             elementID.click();
@@ -415,7 +415,7 @@ public class SeleniumUtil {
      */
     public static void clickElementbyWebElementWithOutSendKeys(final WebDriver driver, final WebElement elementID) {
         try {
-            waitForElementByElement(driver, elementID);
+            waitUntilClickByElement(driver, elementID);
             scrollToElement(driver, elementID);
             elementID.click();
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -448,7 +448,7 @@ public class SeleniumUtil {
      */
     public static void validateElement(final WebDriver driver, final String xpath, final String testCaseName, final String expectedResult) {
         try {
-            waitForElement(driver, xpath);
+            waitUntilVisibleByXpath(driver, xpath);
             final WebElement element = driver.findElement(By.xpath(xpath));
             scrollToElement(driver, element);
             highLighterMethod(driver, element);
@@ -465,7 +465,7 @@ public class SeleniumUtil {
      */
     public static void setValueToElementByXpath(final WebDriver driver, final String xpath, final String inputValue) {
         try {
-            waitForElement(driver, xpath);
+            waitUntilClickByXpath(driver, xpath);
             final WebElement element = driver.findElement(By.xpath(xpath));
             scrollToElement(driver, element);
             highLighterMethod(driver, element);
@@ -479,7 +479,7 @@ public class SeleniumUtil {
 
     public static void setValueToElementByXpath(final WebDriver driver, final WebElement element, final String inputValue) {
         try {
-            waitForElement(driver, element);
+            waitUntilClickByElement(driver, element);
             scrollToElement(driver, element);
             highLighterMethod(driver, element);
             element.clear();
@@ -496,7 +496,7 @@ public class SeleniumUtil {
      */
     public static void setValueToElement(final WebDriver driver, final WebElement webElement, final String inputValue) {
         try {
-            waitForElement(driver, webElement);
+            waitUntilClickByElement(driver, webElement);
             scrollToElement(driver, webElement);
             highLighterMethod(driver, webElement);
             webElement.clear();
@@ -513,10 +513,10 @@ public class SeleniumUtil {
      */
     public static String getValueByElement(final WebDriver driver, final WebElement webElement) {
         try {
-            waitForElement(driver, webElement);
+            waitUntilVisibleByElement(driver, webElement);
             scrollToElement(driver, webElement);
             highLighterMethod(driver, webElement);
-            if (waitForElement(driver, webElement).isDisplayed()) {
+            if (waitUntilVisibleByElement(driver, webElement).isDisplayed()) {
                 return webElement.getText().trim();
             }
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -541,10 +541,10 @@ public class SeleniumUtil {
      */
     public static String getInputElementValue(final WebDriver driver, final WebElement webElement) {
         try {
-            waitForElement(driver, webElement);
+            waitUntilVisibleByElement(driver, webElement);
             scrollToElement(driver, webElement);
             highLighterMethod(driver, webElement);
-            if (waitForElement(driver, webElement).isDisplayed()) {
+            if (waitUntilVisibleByElement(driver, webElement).isDisplayed()) {
                 return webElement.getAttribute("value").trim();
             }
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -560,8 +560,8 @@ public class SeleniumUtil {
      */
     public static Boolean getEnableDisableByElement(final WebDriver driver, final WebElement webElement) {
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement) != null) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement) != null) {
                 return webElement.isEnabled();
             }
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -577,8 +577,8 @@ public class SeleniumUtil {
      */
     public static Boolean isDisableByElement(final WebDriver driver, final WebElement webElement) {
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement) != null) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement) != null) {
                 final String attribute = webElement.getAttribute("disabled");
                 return attribute != null && attribute.equalsIgnoreCase("true");
             }
@@ -617,8 +617,8 @@ public class SeleniumUtil {
      */
     public static Boolean isSpinnerEnabled(final WebDriver driver, final WebElement webElement) {
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement) != null) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement) != null) {
                 final String webElementCSS = getElementsCSS(driver, webElement, "webelemnt CSS");
                 if (webElementCSS != null && !webElementCSS.isEmpty()) {
                     return webElementCSS.contains("loadingSpinner");
@@ -640,8 +640,8 @@ public class SeleniumUtil {
     public static Boolean isDisabledByElementCSS(final WebDriver driver, final WebElement webElement) {
         int i = 20;
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement) != null) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement) != null) {
                 final String webElementCSS = getElementsCSS(driver, webElement, "webelemnt CSS");
                 if (webElementCSS != null && !webElementCSS.isEmpty()) {
                     return webElementCSS.contains("ui-state-disabled");
@@ -662,7 +662,7 @@ public class SeleniumUtil {
      */
     public static void mouseOverElement(final WebDriver driver, final WebElement webElement) {
         try {
-            waitForElement(driver, webElement);
+            waitUntilVisibleByElement(driver, webElement);
             highLighterMethod(driver, webElement);
             final Actions actObj = new Actions(driver);
             actObj.moveToElement(webElement).build().perform();
@@ -678,7 +678,7 @@ public class SeleniumUtil {
      */
     public static void clickCheckedUnCheckedElement(final WebDriver driver, final WebElement elementID) {
         try {
-            waitForElementByElement(driver, elementID);
+            waitUntilClickByElement(driver, elementID);
             final boolean chk = elementID.isEnabled();
             if (chk == true) {
                 elementID.click();
@@ -695,8 +695,8 @@ public class SeleniumUtil {
      */
     public static void mouseOverElementSelect(final WebDriver driver, final WebElement webElement) {
         try {
-            waitForElement(driver, webElement);
-            waitForElement(driver, webElement).isSelected();
+            waitUntilVisibleByElement(driver, webElement);
+            waitUntilVisibleByElement(driver, webElement).isSelected();
             final Actions actObj = new Actions(driver);
             actObj.moveToElement(webElement).build().perform();
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -737,7 +737,7 @@ public class SeleniumUtil {
      */
     public static boolean isElementPresent(final WebDriver driver, final String xPath) {
         try {
-            waitForElementPresence(driver, xPath);
+            waitUntilElementPresenceByXpath(driver, xPath);
             return driver.findElements(By.xpath(xPath)).size() > 0;
         } catch (final NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
@@ -760,8 +760,8 @@ public class SeleniumUtil {
      */
     public static String getCssClassesByElement(final WebDriver driver, final WebElement webElement, final String elementName) {
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement).isDisplayed()) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement).isDisplayed()) {
                 highlightElement(driver, webElement);
                 return webElement.getAttribute("class").trim();
             }
@@ -778,8 +778,8 @@ public class SeleniumUtil {
      */
     public static String getCSSValueByElement(final WebDriver driver, final WebElement webElement, final String cssAttributeName, final String elementName) {
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement).isDisplayed()) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement).isDisplayed()) {
                 highlightElement(driver, webElement);
                 return webElement.getCssValue(cssAttributeName);
             }
@@ -849,8 +849,8 @@ public class SeleniumUtil {
      */
     public static String getElementsCSS(final WebDriver driver, final WebElement webElement, final String elementName) {
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement).isDisplayed()) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement).isDisplayed()) {
                 return webElement.getAttribute("class");
             }
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -874,7 +874,7 @@ public class SeleniumUtil {
      */
     public static boolean xPathExists(final WebDriver driver, final String xpath) {
         try {
-            waitForElement(driver, xpath);
+            waitUntilVisibleByXpath(driver, xpath);
             return true;
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
@@ -889,8 +889,8 @@ public class SeleniumUtil {
      */
     public static String getValueByElementNoLog(final WebDriver driver, final WebElement webElement, final String elementName) {
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement).isDisplayed()) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement).isDisplayed()) {
                 return webElement.getText().trim();
             }
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -907,8 +907,8 @@ public class SeleniumUtil {
     public static Boolean checkVisibilityByElement(final WebDriver driver, final WebElement webElement, final String elementName) {
         Boolean isVisible = false;
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement) != null) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement) != null) {
                 isVisible = true;
             }
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -925,8 +925,8 @@ public class SeleniumUtil {
     public static Boolean isElementEnabled(final WebDriver driver, final WebElement webElement, final String elementName) {
         Boolean isEnabled = false;
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement) != null) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement) != null) {
                 isEnabled = webElement.isEnabled();
             }
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -942,8 +942,8 @@ public class SeleniumUtil {
      */
     public static Boolean isElementNotPresent(final WebDriver driver, final String xPath) {
         try {
-            waitForElementNotPresence(driver, xPath);
-            return waitForElementNotPresence(driver, xPath);
+            waitUntilElementNotPresenceByXpath(driver, xPath);
+            return waitUntilElementNotPresenceByXpath(driver, xPath);
         } catch (final Exception ele) {
             LOGGER.error(ERROR_MSG, ele);
             fail();
@@ -957,8 +957,8 @@ public class SeleniumUtil {
      */
     public static Boolean isElementNotPresentWithWait(final WebDriver driver, final String xPath, final int waitTimeinSec) {
         try {
-            waitForElementNotPresence(driver, xPath, waitTimeinSec);
-            return waitForElementNotPresence(driver, xPath, waitTimeinSec);
+            waitUntilElementNotPresenceByXpathByTime(driver, xPath, waitTimeinSec);
+            return waitUntilElementNotPresenceByXpathByTime(driver, xPath, waitTimeinSec);
         } catch (final Exception ele) {
             LOGGER.error(ERROR_MSG, ele);
             fail();
@@ -972,8 +972,8 @@ public class SeleniumUtil {
      */
     public static Boolean isButtonEnabled(final WebDriver driver, final WebElement webElement) {
         try {
-            waitForElement(driver, webElement);
-            if (waitForElement(driver, webElement).isDisplayed()) {
+            waitUntilVisibleByElement(driver, webElement);
+            if (waitUntilVisibleByElement(driver, webElement).isDisplayed()) {
                 return webElement.isEnabled();
             }
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -989,8 +989,8 @@ public class SeleniumUtil {
      */
     public static String getValueByXpath(final WebDriver driver, final String xPath) {
         try {
-            waitForElement(driver, xPath);
-            if (waitForElement(driver, xPath).isDisplayed()) {
+            waitUntilVisibleByXpath(driver, xPath);
+            if (waitUntilVisibleByXpath(driver, xPath).isDisplayed()) {
                 final WebElement webElement = driver.findElement(By.xpath(xPath));
                 return webElement.getText().trim();
             }
@@ -1018,8 +1018,8 @@ public class SeleniumUtil {
                                            final String elementName) {
         final Boolean isValueExist = false;
         try {
-            waitForElements(driver, webElement);
-            if (waitForElements(driver, webElement) != null) {
+            waitUntilVisibleByElements(driver, webElement);
+            if (waitUntilVisibleByElements(driver, webElement) != null) {
                 final List<WebElement> elements = webElement;
                 for (int i = 0; i < elements.size(); i++) {
                     final String listValue = elements.get(i).getText().trim();
@@ -1155,7 +1155,7 @@ public class SeleniumUtil {
         } else {
             dropDownElement = driver.findElement(By.tagName("p-dropdown"));
         }
-        waitForElement(driver, dropDownElement);
+        waitUntilVisibleByElement(driver, dropDownElement);
         return getValueByElement(driver, dropDownElement.findElement(By.xpath(dropDownLabel)));
     }
 
@@ -1170,7 +1170,7 @@ public class SeleniumUtil {
         } else {
             checkBox = driver.findElement(By.tagName("p-checkbox"));
         }
-        waitForElement(driver, checkBox);
+        waitUntilVisibleByElement(driver, checkBox);
         return checkBox.findElement(By.xpath("div/div[2]")).getAttribute("class").contains("ui-state-active");
     }
 
@@ -1205,7 +1205,7 @@ public class SeleniumUtil {
      * get current screen URL
      */
     public static String getCurrentScreenUrl(final WebDriver driver) {
-        waitForElement(driver,"//th[contains(text(),' Equipment ')]");
+        waitUntilVisibleByXpath(driver,"//th[contains(text(),' Equipment ')]");
         return driver.getCurrentUrl();
 
     }
@@ -1225,8 +1225,8 @@ public class SeleniumUtil {
      */
     public static Boolean isSpinnerLoaded(final WebDriver driver, final WebElement webElement, final String elementName) {
         try {
-          waitForElementInvisible(driver,webElement);
-            if (waitForElementInvisible(driver,webElement) != null) {
+          waitUntilInvisibleByElement(driver,webElement);
+            if (waitUntilInvisibleByElement(driver,webElement) != null) {
                 final String webElementCSS = getElementsCSS(driver, webElement, "webelemnt CSS");
                 if (webElementCSS != null && !webElementCSS.isEmpty()) {
                     return webElementCSS.contains("loadingSpinner");
@@ -1252,7 +1252,7 @@ public class SeleniumUtil {
         wait.until(d -> ExpectedConditions.visibilityOf(d.findElement(By.xpath(SPINNER_XPATH))));
 
         // we have to wait until spinner goes away
-        waitForElementInvisible(driver,driver.findElement(By.xpath(SPINNER_XPATH)));
+        waitUntilInvisibleByElement(driver,driver.findElement(By.xpath(SPINNER_XPATH)));
        }
 
     /**
@@ -1351,7 +1351,7 @@ public class SeleniumUtil {
 
     public static void clearTextField(final WebDriver driver, final WebElement webElement, final String inputValue) {
         try {
-            waitForElement(driver,webElement);
+            waitUntilClickByElement(driver,webElement);
             webElement.sendKeys(Keys.CONTROL, Keys.chord("a"));
             webElement.sendKeys(Keys.BACK_SPACE);
         } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
@@ -1413,61 +1413,88 @@ public class SeleniumUtil {
     /**
      * -------------------------------wait methods --------------------------------------
      */
-    public static void waitForElementById(final WebDriver driver, final String elementID) {
+    public static void waitUntilClickById(final WebDriver driver, final String elementID) {
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(elementID)));
         wait.until(ExpectedConditions.elementToBeClickable(By.id(elementID)));
     }
 
-    public static void waitForElementByXpath(final WebDriver driver, final String elementID) {
+    public static void waitUntilClickByXpath(final WebDriver driver, final String xapth) {
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(elementID)));
-        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(elementID)));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xapth)));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xapth)));
     }
-
-    public static void waitForElementByXpath(final WebDriver driver, final By locator) {
+    public static void waitUntilClickByXpath(final WebDriver driver, final String xapth,int time) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xapth)));
+        wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xapth)));
+    }
+    public static void waitUntilClickByElement(final WebDriver driver, final WebElement webElement) {
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
+        wait.until(ExpectedConditions.visibilityOf((webElement)));
+        wait.until(ExpectedConditions.elementToBeClickable(webElement));
+    }
+    public static void waitUntilClickByElementByTime(final WebDriver driver, final WebElement webElement,int time) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
+        wait.until(ExpectedConditions.visibilityOf((webElement)));
+        wait.until(ExpectedConditions.elementToBeClickable(webElement));
+    }
+    public static WebElement waitUntilClickByLocator(final WebDriver driver, final By locator) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        return wait.until(ExpectedConditions.elementToBeClickable(locator));
+    }
+    public static void waitUntilClickByLocatorByTime(final WebDriver driver, final By locator,int time) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
         wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
         wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
-    public static void waitForElementByElement(final WebDriver driver, final WebElement elementID) {
-        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
-        wait.until(ExpectedConditions.visibilityOf(elementID));
-        wait.until(ExpectedConditions.elementToBeClickable(elementID));
-    }
-
-    public static WebElement waitForElement(final WebDriver driver, final String Xpath) {
+   public static WebElement waitUntilVisibleByXpath(final WebDriver driver, final String Xpath) {
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         return wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Xpath)));
     }
 
-    public static WebElement waitForElement(final WebDriver driver, final WebElement element) {
+    public static WebElement waitUntilVisibleByLocator(final WebDriver driver, final By Locator) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(Locator));
+    }
+    public static WebElement waitUntilVisibleByXpathByTIme(final WebDriver driver, final String Xpath,int time) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(Xpath)));
+    }
+
+    public static WebElement waitUntilVisibleByElement(final WebDriver driver, final WebElement element) {
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         return wait.until(ExpectedConditions.visibilityOf(element));
     }
 
-    public static WebElement waitForElementPresence(final WebDriver driver, final String Xpath) {
+    public static WebElement waitUntilVisibleByElementByTIme(final WebDriver driver, final WebElement element, int time) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
+        return wait.until(ExpectedConditions.visibilityOf(element));
+    }
+
+    public static WebElement waitUntilElementPresenceByXpath(final WebDriver driver, final String Xpath) {
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         return wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(Xpath)));
     }
 
-    public static Boolean waitForElementNotPresence(final WebDriver driver, final String Xpath) {
+    public static Boolean waitUntilElementNotPresenceByXpath(final WebDriver driver, final String Xpath) {
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         return wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(Xpath)));
     }
 
-    public static Boolean waitForElementNotPresence(final WebDriver driver, final String Xpath, int time) {
+    public static Boolean waitUntilElementNotPresenceByXpathByTime(final WebDriver driver, final String Xpath, int time) {
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
         return wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(Xpath)));
     }
 
-    public static List<WebElement> waitForElements(final WebDriver driver, final List<WebElement> webElements) {
+    public static List<WebElement> waitUntilVisibleByElements(final WebDriver driver, final List<WebElement> webElements) {
         final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         return wait.until(ExpectedConditions.visibilityOfAllElements(webElements));
     }
 
-  public static Boolean waitForElementInvisible(final WebDriver driver, final WebElement element) {
+  public static Boolean waitUntilInvisibleByElement(final WebDriver driver, final WebElement element) {
     final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
     return wait.until(ExpectedConditions.invisibilityOf(element));
   }
@@ -1481,13 +1508,7 @@ public class SeleniumUtil {
         }
     }
 
-    public static void waitUntilElementClickable(WebDriver driver, By locator) {
-        LOGGER.info("Before waitUntilElementVisible::" + locator);
-        WebDriverWait expWait = new WebDriverWait(driver, Duration.ofSeconds(60));
-        expWait.until(ExpectedConditions.elementToBeClickable(locator));
-    }
-
-    public static FluentWait webDriverFluentWait(WebDriver driver) {
+   public static FluentWait webDriverFluentWait(WebDriver driver) {
         return new FluentWait(driver)
                 .withTimeout(Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS))
                 .pollingEvery(Duration.ofSeconds(3))
@@ -1501,80 +1522,16 @@ public class SeleniumUtil {
                 .ignoring(NoSuchElementException.class, NoSuchFrameException.class);
     }
 
-    public static WebElement waitForElement(WebDriver driver, final By byElement) {
-        WebElement element = null;
-        try {
-            LOGGER.info("BeforeWaitForElement::" + byElement);
-            waitForElementByXpath(driver, byElement);
-            if (!isElementVisible(driver, byElement)) {
-                scrollToView(driver, byElement);
-            } else {
-                element = driver.findElement(byElement);
-            }
-        } catch (WebDriverException e) {
-            LOGGER.error("Exception in waitForElement::" + byElement + " " + e);
-            throw new WebDriverException(e);
-        }
-        return element;
-    }
-
-    public static WebElement waitForElement(WebDriver driver, final By byElement, int time) {
-        WebElement element = null;
-        try {
-            LOGGER.info("BeforeWaitForElement::" + byElement);
-            waitForElementByXpath(driver, byElement);
-            if (!isElementVisible(driver, byElement)) {
-                scrollToView(driver, byElement);
-            } else {
-                element = driver.findElement(byElement);
-            }
-        } catch (WebDriverException e) {
-            LOGGER.error("Exception in waitForElement::" + byElement + " " + e);
-            throw new WebDriverException(e);
-        }
-        return element;
-    }
-
-    public static WebElement waitForElement(WebDriver driver, final String Xpath, int time) {
-        WebElement element = null;
-        try {
-            LOGGER.info("BeforeWaitForElement::" + Xpath);
-            waitForElement(driver, Xpath);
-            if (!isElementVisible(driver, By.xpath(Xpath))) {
-                scrollToView(driver, By.xpath(Xpath));
-            } else {
-                element = driver.findElement(By.xpath(Xpath));
-            }
-        } catch (WebDriverException e) {
-            LOGGER.error("Exception in waitForElement::" + Xpath + " " + e);
-            throw new WebDriverException(e);
-        }
-        return element;
-    }
-
-    public static void waitForElement(WebDriver driver, final WebElement element, int time) {
-        try {
-            LOGGER.info("BeforeWaitForElement::" + element);
-            waitForElement(driver, element);
-            if (!isElementVisible(driver, element)) {
-                scrollToElement(driver, element);
-            }
-        } catch (WebDriverException e) {
-            LOGGER.error("Exception in waitForElement::" + element + " " + e);
-            throw new WebDriverException(e);
-        }
-    }
-
-    public static List<WebElement> waitForElements(WebDriver driver, By element, int timeout) {
+    public static List<WebElement> waitForElementsByTime(WebDriver driver, By element, int timeout) {
         new WebDriverWait(driver, Duration.ofSeconds(timeout)).until(ExpectedConditions.visibilityOfElementLocated(element));
         return driver.findElements(element);
     }
 
     public static List<WebElement> waitForElements(WebDriver driver, By element) {
-        return waitForElements(driver, element, DRIVER_WAIT_TIME_IN_SECS);
+        return waitForElementsByTime(driver, element, DRIVER_WAIT_TIME_IN_SECS);
     }
 
-    public static void waitForElementLoading(WebDriver driver, final By byElement) {
+    public static void fluentWaitForElementLoading(WebDriver driver, final By byElement) {
         try {
             Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
                     .withTimeout(Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS))
@@ -1706,21 +1663,23 @@ public class SeleniumUtil {
      */
 
     public static void clickElementWithWait(WebDriver driver, String locator, int time) {
-        waitForElement(driver, locator, time);
+        waitUntilClickByLocatorByTime(driver, By.xpath(locator), time);
         WebElement element = driver.findElement(By.xpath(locator));
+        scrollToElement(driver,element);
         element.click();
 
     }
 
     public static void clickElementWithWait(WebDriver driver, WebElement element, int time) {
-        waitForElement(driver, element, time);
+        waitUntilClickByElementByTime(driver, element, time);
+        scrollToElement(driver,element);
         element.click();
     }
 
     public static void clickUsingJavaScript(WebDriver driver, By locator) {
         LOGGER.info("BeforeWaitForElement in clickUsingJavaScript::" + locator);
         try {
-            WebElement elm = waitForElement(driver, locator);
+            WebElement elm = waitUntilClickByLocator(driver, locator);
             if (!isElementVisible(driver, locator)) {
                 scrollToElement(driver, elm);
             }
@@ -1735,8 +1694,8 @@ public class SeleniumUtil {
 
     public static void clickUsingJavaScript(WebDriver driver, WebElement element) {
         LOGGER.info("BeforeWaitForElement in clickUsingJavaScript::" + element);
-        waitForElement(driver, element);
         try {
+            waitUntilClickByElement(driver, element);
             if (!isElementVisible(driver, element)) {
                 scrollToElement(driver, element);
             }
@@ -1750,19 +1709,19 @@ public class SeleniumUtil {
     }
 
     public static void clickWithWait(WebDriver driver, By locator) {
-        try {
-            WebElement elm = waitForElement(driver, locator);
-            LOGGER.info("BeforeWaitForElement in buttonClick ::" + locator);
+        LOGGER.info("BeforeWaitForElement in buttonClick ::" + locator);
+         try {
+            WebElement elm = waitUntilClickByLocator(driver,locator);
             if (!isElementVisible(driver, locator)) {
                 scrollToView(driver, locator);
             }
-            waitForElement(driver, locator);
+            elm =waitUntilClickByLocator(driver, locator);
             if (isElementVisible(driver, locator)) {
                 scrollToView(driver, locator);
                 highlightElement(driver, locator);
                 elm.click();
             } else {
-                waitUntilElementClickable(driver, locator);
+                waitUntilClickByLocator(driver, locator);
                 scrollToView(driver, locator);
                 highlightElement(driver, locator);
                 elm.click();
@@ -1772,30 +1731,6 @@ public class SeleniumUtil {
             LOGGER.error(Level.FINEST + "Exception in clicking::" + e);
         }
     }
-
-    public static void buttonClick(WebDriver driver, By locator) {
-        try {
-            LOGGER.info("BeforeWaitForElement in buttonClick ::" + locator);
-            if (!isElementVisible(driver, locator)) {
-                scrollToView(driver, locator);
-            }
-            WebElement elm = waitForElement(driver, locator);
-            if (isElementVisible(driver, locator)) {
-                scrollToView(driver, locator);
-                highlightElement(driver, locator);
-                elm.click();
-            } else {
-                waitUntilElementClickable(driver, locator);
-                scrollToView(driver, locator);
-                highlightElement(driver, locator);
-                elm.click();
-            }
-            waitTillLoadingCompletes(driver, driver.findElement(locator));
-        } catch (Exception e) {
-            LOGGER.error("Exception in buttonClick::" + e);
-        }
-    }
-
     public static void buttonClick(WebDriver driver, WebElement element) {
         try {
             LOGGER.info("BeforeWaitForElement in buttonClick::");
@@ -1812,19 +1747,19 @@ public class SeleniumUtil {
 
     public static void doubleClick(WebDriver driver, By locator) {
         Actions actions = new Actions(driver);
-        waitForElement(driver, locator);
+        waitUntilClickByLocator(driver, locator);
         waitByTime(1000);
         WebElement elementLocator = driver.findElement(locator);
         if (!isElementVisible(driver, locator)) {
             scrollToView(driver, locator);
         }
-        waitForElement(driver, locator);
+        waitUntilClickByLocator(driver, locator);
         if (isElementVisible(driver, locator)) {
             highlightElement(driver, locator);
             actions.moveToElement(elementLocator).build();
             actions.doubleClick(elementLocator).build().perform();
         } else {
-            waitUntilElementClickable(driver, locator);
+            waitUntilClickByLocator(driver, locator);
             highlightElement(driver, locator);
             actions.moveToElement(elementLocator).build();
             actions.doubleClick(elementLocator).build().perform();
@@ -1834,19 +1769,19 @@ public class SeleniumUtil {
 
     public static void singleClick(WebDriver driver, By locator) {
         Actions actions = new Actions(driver);
-        waitForElement(driver, locator);
+        waitUntilClickByLocator(driver, locator);
         waitByTime(1000);
         WebElement elementLocator = driver.findElement(locator);
         if (!isElementVisible(driver, locator)) {
             scrollToView(driver, locator);
         }
-        waitForElement(driver, locator);
+        waitUntilClickByLocator(driver, locator);
         if (isElementVisible(driver, locator)) {
             actions.moveToElement(elementLocator).build();
             highlightElement(driver, locator);
             actions.click(elementLocator).build().perform();
         } else {
-            waitUntilElementClickable(driver, locator);
+            waitUntilClickByLocator(driver, locator);
             highlightElement(driver, locator);
             actions.moveToElement(elementLocator).build();
             actions.click(elementLocator).build().perform();
@@ -1856,17 +1791,17 @@ public class SeleniumUtil {
 
     public static void clickWithMultipleTimes(WebDriver driver, By locator, int clicks) {
         try {
-            WebElement elm = waitForElement(driver, locator);
+            WebElement elm = waitUntilClickByLocator(driver, locator);
             LOGGER.info("BeforeWaitForElement in buttonClick ::" + locator);
             if (!isElementVisible(driver, locator)) {
                 scrollToView(driver, locator);
             }
             for (int i = 0; i < clicks; i++) {
-                waitForElement(driver, locator);
+                waitUntilClickByLocator(driver, locator);
                 if (isElementVisible(driver, locator)) {
                     elm.click();
                 } else {
-                    waitUntilElementClickable(driver, locator);
+                    waitUntilClickByLocator(driver, locator);
                     elm.click();
                 }
                 waitTillLoadingCompletes(driver, driver.findElement(locator));
@@ -1884,7 +1819,7 @@ public class SeleniumUtil {
 
     public static void clearAndEnterText(WebDriver driver, By locator, String text) {
         LOGGER.info("Before clearAndEnterText::" + locator + ", with text: " + text);
-        WebElement webElementEnter = waitForElement(driver, locator);
+        WebElement webElementEnter = waitUntilClickByLocator(driver, locator);
         if (!isElementVisible(driver, locator)) {
             scrollToElement(driver, webElementEnter);
         }
@@ -1902,7 +1837,7 @@ public class SeleniumUtil {
 
     public static void clearAndEnterValue(WebDriver driver, By locator, String text) {
         LOGGER.info("Before clearAndEnterText::" + locator + ", with text: " + text);
-        WebElement webElementEnter = waitForElement(driver, locator);
+        WebElement webElementEnter = waitUntilClickByLocator(driver, locator);
         if (!isElementVisible(driver, locator)) {
             scrollToElement(driver, webElementEnter);
         }
@@ -1919,7 +1854,7 @@ public class SeleniumUtil {
         if (!isElementVisible(driver, locator)) {
             scrollToView(driver, locator);
         }
-        WebElement webElementEnter = waitForElement(driver, locator);
+        WebElement webElementEnter = waitUntilClickByLocator(driver, locator);
         highlightElement(driver, locator);
         webElementEnter.sendKeys(text);
     }
@@ -1957,7 +1892,7 @@ public class SeleniumUtil {
     public static boolean isElementPresent(WebDriver driver, By locator) {
         try {
             LOGGER.info("Before isElementPresent::" + locator);
-            waitForElement(driver, locator);
+            waitUntilVisibleByLocator(driver,locator);
             driver.findElement(locator);
             return true;
         } catch (Exception e) {
@@ -2018,7 +1953,7 @@ public class SeleniumUtil {
      */
 
     public static void uncheckCheckbox(WebDriver driver, By locator) {
-        waitForElement(driver, locator);
+        waitUntilClickByLocator(driver, locator);
         if (Boolean.TRUE.equals(driver.findElement(locator).isSelected())) {
             highlightElement(driver, locator);
             clickWithWait(driver, locator);
@@ -2026,7 +1961,7 @@ public class SeleniumUtil {
     }
 
     public static void checkCheckbox(WebDriver driver, By locator) {
-        waitForElement(driver, locator);
+        waitUntilClickByLocator(driver, locator);
         if (Boolean.FALSE.equals(driver.findElement(locator).isSelected())) {
             highlightElement(driver, locator);
             clickWithWait(driver, locator);
