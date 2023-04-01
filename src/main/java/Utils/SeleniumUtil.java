@@ -1,6 +1,29 @@
 
 package Utils;
 
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.logging.Level;
+
 import io.cucumber.core.api.Scenario;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.comparator.LastModifiedFileComparator;
@@ -9,10 +32,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.junit.jupiter.api.Assertions;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.*;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.yandex.qatools.ashot.AShot;
@@ -21,27 +46,19 @@ import ru.yandex.qatools.ashot.comparison.ImageDiff;
 import ru.yandex.qatools.ashot.comparison.ImageDiffer;
 
 import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.*;
-import java.net.URL;
-import java.sql.*;
-import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.*;
-import java.util.logging.Level;
 
-public class SeleniumUtil_New {
+import static org.junit.jupiter.api.Assertions.fail;
+
+
+public class SeleniumUtil {
 
     private static final String SPINNER_XPATH = "//app-block-ui/div/p-blockui";
     public static final String ERROR_MSG = "Some error has occurred while performing operation::{}";
     public static final String IS_ENTERED = " is entered";
     public static final String AND_PASSWORD = " and Password: ";
     public static final String USERNAME = "Username: ";
-    private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumUtil_New.class);
-    public static final int DRIVER_WAIT_TIME_IN_SECS = 120;
+    private static final Logger LOGGER = LoggerFactory.getLogger(SeleniumUtil.class);
+    public static final int DRIVER_WAIT_TIME_IN_SECS = 30;
     private static final String DROPDOWN_ITEM_SELECTOR_IN_OVERLAY = "//ul/li[*]/span[text()='%s']";
     private static final String DROPDOWN_PARTIAL_MATCH_ITEM_SELECTOR_IN_OVERLAY = "//ul/li[*]/span[contains(text(),'%s')]";
     private static final String DROPDOWN_OVERLAY = "//ul";
@@ -53,12 +70,9 @@ public class SeleniumUtil_New {
     private static final String LOGINPAGE_PASSWORD_TEXTBOX_OBJECT_ID = "password";
     private static final String LOGINPAGE_LOGIN_BUTTON_OBJECT_XPATH = "//*[@id=\"okta-login-section\"]/div[7]/input";
     public static final String downloadPath = System.getProperty("user.dir");
-    private static int defaultMaxTime = 60;
     private static int maxSyncTime = 60;
 
-    private boolean isCustomWait = false;
-
-    private SeleniumUtil_New() {
+    private SeleniumUtil() {
     }
 
     /**
@@ -162,13 +176,13 @@ public class SeleniumUtil_New {
             Class.forName("oracle.jdbc.OracleDriver");
         } catch (ClassNotFoundException e) {
             LOGGER.error(ERROR_MSG, e);
-            Assertions.fail();
+            fail();
         }
         try {
             dbConnection = DriverManager.getConnection(dbUrl, username, password);
         } catch (SQLException e) {
             LOGGER.error(ERROR_MSG, e);
-            Assertions.fail();
+            fail();
         }
 
         Statement stmt = dbConnection.createStatement();
@@ -195,13 +209,13 @@ public class SeleniumUtil_New {
             Class.forName("oracle.jdbc.OracleDriver");
         } catch (ClassNotFoundException e) {
             LOGGER.error(ERROR_MSG, e);
-            Assertions.fail();
+            fail();
         }
         try {
             dbConnection = DriverManager.getConnection(dbUrl, username, password);
         } catch (SQLException e) {
             LOGGER.error(ERROR_MSG, e);
-            Assertions.fail();
+            fail();
         }
         Statement stmt = dbConnection.createStatement();
         ResultSet rs = stmt.executeQuery(sqlQuery);
@@ -345,29 +359,12 @@ public class SeleniumUtil_New {
 
     /**
      * ------------------------------------------------------------------------------------------------------------------
-     * Click on the WebElement With XPATH and handling WebDriverWait to handle NoSuchElementException
-     * Passing Element as WebElement
-     */
-    public void clickElementByWebElement(final WebDriver driver, final By locator) {
-        try {
-            waitForElementByXpath(driver, locator);
-            WebElement element = driver.findElement(locator);
-            highLighterMethod(driver, element);
-            element.click();
-            waitByTime(1000);
-        } catch (TimeoutException | NoSuchElementException ele) {
-            LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
-        }
-    }
-
-    /**
-     * ------------------------------------------------------------------------------------------------------------------
      * Click on the WebElement With ID and handling WebDriverWait to handle NoSuchElementException
      * Passing Element as String
      */
     public static void clickElementByID(final WebDriver driver, final String elementID) {
         waitForElementById(driver, elementID);
+        scrollToElement(driver, driver.findElement(By.id(elementID)));
         highLighterMethod(driver, driver.findElement(By.id(elementID)));
         driver.findElement(By.id(elementID)).click();
     }
@@ -380,11 +377,11 @@ public class SeleniumUtil_New {
     public static void clickElementbyXPath(final WebDriver driver, final String elementID) {
         try {
             waitForElementByXpath(driver, elementID);
-            highLighterMethod(driver, driver.findElement(By.xpath(elementID)));
+            scrollToElement(driver, driver.findElement(By.xpath(elementID)));
             driver.findElement(By.xpath(elementID)).click();
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -396,15 +393,17 @@ public class SeleniumUtil_New {
     public static void clickElementbyWebElement(final WebDriver driver, final WebElement elementID) {
         try {
             waitForElementByElement(driver, elementID);
+            scrollToElement(driver, elementID);
             elementID.sendKeys("");
             elementID.click();
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         } catch (final Exception e) {
-      /* If clickElementbyWebElement method failed to click on the element with sendKyes
-      then this catch block will be executed with calling
-      clickElementbyWebElementWithOutSendKeys method*/
+            // If clickElementbyWebElement method failed to click on the element with
+            // sendKyes
+            // then this catch block will be executed with calling
+            // clickElementbyWebElementWithOutSendKeys method
             clickElementbyWebElementWithOutSendKeys(driver, elementID);
         }
     }
@@ -417,11 +416,11 @@ public class SeleniumUtil_New {
     public static void clickElementbyWebElementWithOutSendKeys(final WebDriver driver, final WebElement elementID) {
         try {
             waitForElementByElement(driver, elementID);
-            highLighterMethod(driver, elementID);
+            scrollToElement(driver, elementID);
             elementID.click();
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -451,11 +450,12 @@ public class SeleniumUtil_New {
         try {
             waitForElement(driver, xpath);
             final WebElement element = driver.findElement(By.xpath(xpath));
+            scrollToElement(driver, element);
             highLighterMethod(driver, element);
             Assertions.assertEquals(expectedResult.trim(), element.getText().trim());
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -467,24 +467,26 @@ public class SeleniumUtil_New {
         try {
             waitForElement(driver, xpath);
             final WebElement element = driver.findElement(By.xpath(xpath));
+            scrollToElement(driver, element);
             highLighterMethod(driver, element);
             element.clear();
             element.sendKeys(inputValue);
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
     public static void setValueToElementByXpath(final WebDriver driver, final WebElement element, final String inputValue) {
         try {
             waitForElement(driver, element);
+            scrollToElement(driver, element);
             highLighterMethod(driver, element);
             element.clear();
             element.sendKeys(inputValue);
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -495,12 +497,13 @@ public class SeleniumUtil_New {
     public static void setValueToElement(final WebDriver driver, final WebElement webElement, final String inputValue) {
         try {
             waitForElement(driver, webElement);
+            scrollToElement(driver, webElement);
             highLighterMethod(driver, webElement);
             webElement.clear();
             webElement.sendKeys(inputValue);
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -511,13 +514,14 @@ public class SeleniumUtil_New {
     public static String getValueByElement(final WebDriver driver, final WebElement webElement) {
         try {
             waitForElement(driver, webElement);
+            scrollToElement(driver, webElement);
             highLighterMethod(driver, webElement);
-            if (webElement.isDisplayed()) {
+            if (waitForElement(driver, webElement).isDisplayed()) {
                 return webElement.getText().trim();
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -538,13 +542,14 @@ public class SeleniumUtil_New {
     public static String getInputElementValue(final WebDriver driver, final WebElement webElement) {
         try {
             waitForElement(driver, webElement);
+            scrollToElement(driver, webElement);
             highLighterMethod(driver, webElement);
-            if (webElement.isDisplayed()) {
+            if (waitForElement(driver, webElement).isDisplayed()) {
                 return webElement.getAttribute("value").trim();
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -559,10 +564,9 @@ public class SeleniumUtil_New {
             if (waitForElement(driver, webElement) != null) {
                 return webElement.isEnabled();
             }
-            highLighterMethod(driver, webElement);
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return false;
     }
@@ -572,16 +576,15 @@ public class SeleniumUtil_New {
      * is Disable by element
      */
     public static Boolean isDisableByElement(final WebDriver driver, final WebElement webElement) {
-        waitForElement(driver, webElement);
         try {
+            waitForElement(driver, webElement);
             if (waitForElement(driver, webElement) != null) {
                 final String attribute = webElement.getAttribute("disabled");
                 return attribute != null && attribute.equalsIgnoreCase("true");
             }
-            highLighterMethod(driver, webElement);
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return false;
     }
@@ -601,9 +604,9 @@ public class SeleniumUtil_New {
                 final Boolean isElementEnabled = webElement.isEnabled();
                 return testIsEnabled ? isElementEnabled : !isElementEnabled;
             });
-        } catch (final TimeoutException ele) {
+        } catch (final org.openqa.selenium.TimeoutException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return isEnabled;
     }
@@ -613,8 +616,8 @@ public class SeleniumUtil_New {
      * is Spinner Enabled
      */
     public static Boolean isSpinnerEnabled(final WebDriver driver, final WebElement webElement) {
-        waitForElement(driver, webElement);
         try {
+            waitForElement(driver, webElement);
             if (waitForElement(driver, webElement) != null) {
                 final String webElementCSS = getElementsCSS(driver, webElement, "webelemnt CSS");
                 if (webElementCSS != null && !webElementCSS.isEmpty()) {
@@ -623,9 +626,9 @@ public class SeleniumUtil_New {
                     return false;
                 }
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return false;
     }
@@ -635,9 +638,9 @@ public class SeleniumUtil_New {
      * Is disabled by element CSS
      */
     public static Boolean isDisabledByElementCSS(final WebDriver driver, final WebElement webElement) {
-        waitForElement(driver, webElement);
         int i = 20;
         try {
+            waitForElement(driver, webElement);
             if (waitForElement(driver, webElement) != null) {
                 final String webElementCSS = getElementsCSS(driver, webElement, "webelemnt CSS");
                 if (webElementCSS != null && !webElementCSS.isEmpty()) {
@@ -646,9 +649,9 @@ public class SeleniumUtil_New {
                     return false;
                 }
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return false;
     }
@@ -663,9 +666,9 @@ public class SeleniumUtil_New {
             highLighterMethod(driver, webElement);
             final Actions actObj = new Actions(driver);
             actObj.moveToElement(webElement).build().perform();
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -680,9 +683,9 @@ public class SeleniumUtil_New {
             if (chk == true) {
                 elementID.click();
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -691,15 +694,14 @@ public class SeleniumUtil_New {
      * Mouse over element select
      */
     public static void mouseOverElementSelect(final WebDriver driver, final WebElement webElement) {
-        waitForElement(driver, webElement);
         try {
+            waitForElement(driver, webElement);
             waitForElement(driver, webElement).isSelected();
-            highLighterMethod(driver, webElement);
             final Actions actObj = new Actions(driver);
             actObj.moveToElement(webElement).build().perform();
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -735,10 +737,11 @@ public class SeleniumUtil_New {
      */
     public static boolean isElementPresent(final WebDriver driver, final String xPath) {
         try {
+            waitForElementPresence(driver, xPath);
             return driver.findElements(By.xpath(xPath)).size() > 0;
         } catch (final NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
             return false;
         }
     }
@@ -748,7 +751,7 @@ public class SeleniumUtil_New {
      * Is Anchor present
      */
     public static boolean isAnchorPresent(final WebDriver driver, final String text) {
-        return SeleniumUtil_New.isElementPresent(driver, "//a[contains(text(),'" + text + "')]");
+        return SeleniumUtil.isElementPresent(driver, "//a[contains(text(),'" + text + "')]");
     }
 
     /**
@@ -756,14 +759,15 @@ public class SeleniumUtil_New {
      * get CSS classes by element
      */
     public static String getCssClassesByElement(final WebDriver driver, final WebElement webElement, final String elementName) {
-        waitForElement(driver, webElement);
         try {
+            waitForElement(driver, webElement);
             if (waitForElement(driver, webElement).isDisplayed()) {
+                highlightElement(driver, webElement);
                 return webElement.getAttribute("class").trim();
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -772,16 +776,16 @@ public class SeleniumUtil_New {
      * -------------------------------------------------------------------------------------------------------
      * Get CSS value by element
      */
-    public static String getCSSValueByElement(final WebDriver driver, final WebElement webElement, final String cssAttributeName,
-                                              final String elementName) {
-        waitForElement(driver, webElement);
+    public static String getCSSValueByElement(final WebDriver driver, final WebElement webElement, final String cssAttributeName, final String elementName) {
         try {
+            waitForElement(driver, webElement);
             if (waitForElement(driver, webElement).isDisplayed()) {
+                highlightElement(driver, webElement);
                 return webElement.getCssValue(cssAttributeName);
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -822,7 +826,7 @@ public class SeleniumUtil_New {
             return webElement.isDisplayed();
         } catch (final NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
             return false;
         }
     }
@@ -849,9 +853,9 @@ public class SeleniumUtil_New {
             if (waitForElement(driver, webElement).isDisplayed()) {
                 return webElement.getAttribute("class");
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -870,11 +874,11 @@ public class SeleniumUtil_New {
      */
     public static boolean xPathExists(final WebDriver driver, final String xpath) {
         try {
-            waitForElementByXpath(driver, xpath);
+            waitForElement(driver, xpath);
             return true;
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
             return false;
         }
     }
@@ -889,9 +893,9 @@ public class SeleniumUtil_New {
             if (waitForElement(driver, webElement).isDisplayed()) {
                 return webElement.getText().trim();
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -907,7 +911,7 @@ public class SeleniumUtil_New {
             if (waitForElement(driver, webElement) != null) {
                 isVisible = true;
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
             // fail();
         }
@@ -925,9 +929,9 @@ public class SeleniumUtil_New {
             if (waitForElement(driver, webElement) != null) {
                 isEnabled = webElement.isEnabled();
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return isEnabled;
     }
@@ -937,12 +941,12 @@ public class SeleniumUtil_New {
      * is element not present
      */
     public static Boolean isElementNotPresent(final WebDriver driver, final String xPath) {
-        final WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         try {
-            return driverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xPath)));
+            waitForElementNotPresence(driver, xPath);
+            return waitForElementNotPresence(driver, xPath);
         } catch (final Exception ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
             return true;
         }
     }
@@ -952,12 +956,12 @@ public class SeleniumUtil_New {
      * is element not present with wait
      */
     public static Boolean isElementNotPresentWithWait(final WebDriver driver, final String xPath, final int waitTimeinSec) {
-        final WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofSeconds(waitTimeinSec));
         try {
-            return driverWait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(xPath)));
+            waitForElementNotPresence(driver, xPath, waitTimeinSec);
+            return waitForElementNotPresence(driver, xPath, waitTimeinSec);
         } catch (final Exception ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
             return true;
         }
     }
@@ -972,9 +976,9 @@ public class SeleniumUtil_New {
             if (waitForElement(driver, webElement).isDisplayed()) {
                 return webElement.isEnabled();
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -990,9 +994,9 @@ public class SeleniumUtil_New {
                 final WebElement webElement = driver.findElement(By.xpath(xPath));
                 return webElement.getText().trim();
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -1002,7 +1006,7 @@ public class SeleniumUtil_New {
      * is form control input field filled and valid
      */
     public static boolean isFormControlInputFieldFilledAndValid(final WebDriver driver, final WebElement webElement) {
-        final String fieldCSS = SeleniumUtil_New.getElementsCSS(driver, webElement, "tsFailedPaymentOopsImage");
+        final String fieldCSS = SeleniumUtil.getElementsCSS(driver, webElement, "tsFailedPaymentOopsImage");
         return fieldCSS.contains("ui-state-filled") && !fieldCSS.contains("ng-invalid");
     }
 
@@ -1013,9 +1017,9 @@ public class SeleniumUtil_New {
     public static boolean checkValueInList(final WebDriver driver, final List<WebElement> webElement, final String expectedValueInList,
                                            final String elementName) {
         final Boolean isValueExist = false;
-        final WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         try {
-            if (driverWait.until(ExpectedConditions.visibilityOfAllElements(webElement)) != null) {
+            waitForElements(driver, webElement);
+            if (waitForElements(driver, webElement) != null) {
                 final List<WebElement> elements = webElement;
                 for (int i = 0; i < elements.size(); i++) {
                     final String listValue = elements.get(i).getText().trim();
@@ -1025,9 +1029,9 @@ public class SeleniumUtil_New {
                 }
                 return isValueExist;
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return isValueExist;
     }
@@ -1068,9 +1072,9 @@ public class SeleniumUtil_New {
                 }
                 return null;
             });
-        } catch (TimeoutException | InterruptedException ele) {
+        } catch (org.openqa.selenium.TimeoutException | InterruptedException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -1083,9 +1087,9 @@ public class SeleniumUtil_New {
         try {
             final JavascriptExecutor js = (JavascriptExecutor) driver;
             return (String) js.executeScript("return document.getElementById(" + "'" + elementId + "'" + ").value");
-        } catch (final TimeoutException ele) {
+        } catch (final org.openqa.selenium.TimeoutException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -1131,7 +1135,7 @@ public class SeleniumUtil_New {
             Thread.sleep(300);
         } catch (final InterruptedException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         driverWait.until(ExpectedConditions.visibilityOf(dropDownElement.findElement(By.xpath(DROPDOWN_OVERLAY))));
         return dropDownElement;
@@ -1151,8 +1155,7 @@ public class SeleniumUtil_New {
         } else {
             dropDownElement = driver.findElement(By.tagName("p-dropdown"));
         }
-        final WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofSeconds(driverWaitTimeInSecs));
-        driverWait.until(ExpectedConditions.visibilityOf(dropDownElement));
+        waitForElement(driver, dropDownElement);
         return getValueByElement(driver, dropDownElement.findElement(By.xpath(dropDownLabel)));
     }
 
@@ -1167,8 +1170,7 @@ public class SeleniumUtil_New {
         } else {
             checkBox = driver.findElement(By.tagName("p-checkbox"));
         }
-        final WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
-        driverWait.until(ExpectedConditions.visibilityOf(checkBox));
+        waitForElement(driver, checkBox);
         return checkBox.findElement(By.xpath("div/div[2]")).getAttribute("class").contains("ui-state-active");
     }
 
@@ -1180,7 +1182,6 @@ public class SeleniumUtil_New {
         final JavascriptExecutor js = (JavascriptExecutor) driver;
         js.executeScript("arguments[0].setAttribute('style', 'background: yellow; border: 2px solid red;');", element);
     }
-
 
     /**
      * -------------------------------------------------------------------------------------------------------
@@ -1204,8 +1205,9 @@ public class SeleniumUtil_New {
      * get current screen URL
      */
     public static String getCurrentScreenUrl(final WebDriver driver) {
-        waitForElement(driver, "//th[contains(text(),' Equipment ')]");
+        waitForElement(driver,"//th[contains(text(),' Equipment ')]");
         return driver.getCurrentUrl();
+
     }
 
     /**
@@ -1222,9 +1224,9 @@ public class SeleniumUtil_New {
      * is spinner loaded
      */
     public static Boolean isSpinnerLoaded(final WebDriver driver, final WebElement webElement, final String elementName) {
-        final WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         try {
-            if (driverWait.until(ExpectedConditions.invisibilityOf(webElement)) != null) {
+          waitForElementInvisible(driver,webElement);
+            if (waitForElementInvisible(driver,webElement) != null) {
                 final String webElementCSS = getElementsCSS(driver, webElement, "webelemnt CSS");
                 if (webElementCSS != null && !webElementCSS.isEmpty()) {
                     return webElementCSS.contains("loadingSpinner");
@@ -1232,9 +1234,9 @@ public class SeleniumUtil_New {
                     return false;
                 }
             }
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return false;
     }
@@ -1250,9 +1252,8 @@ public class SeleniumUtil_New {
         wait.until(d -> ExpectedConditions.visibilityOf(d.findElement(By.xpath(SPINNER_XPATH))));
 
         // we have to wait until spinner goes away
-        final Wait<WebDriver> wait1 = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
-        wait1.until(ExpectedConditions.invisibilityOf(driver.findElement(By.xpath(SPINNER_XPATH))));
-    }
+        waitForElementInvisible(driver,driver.findElement(By.xpath(SPINNER_XPATH)));
+       }
 
     /**
      * -------------------------------------------------------------------------------------------------------
@@ -1265,9 +1266,9 @@ public class SeleniumUtil_New {
             String value = hiddenDiv.getText();
             final String script = "return arguments[0].innerHTML";
             return value = (String) ((JavascriptExecutor) driver).executeScript(script, hiddenDiv);
-        } catch (final TimeoutException ele) {
+        } catch (final org.openqa.selenium.TimeoutException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         return null;
     }
@@ -1303,7 +1304,7 @@ public class SeleniumUtil_New {
             Thread.sleep(5000);
         } catch (final InterruptedException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -1325,7 +1326,7 @@ public class SeleniumUtil_New {
             Thread.sleep(5000);
         } catch (final InterruptedException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -1342,21 +1343,20 @@ public class SeleniumUtil_New {
                 final String script = "return arguments[0].innerHTML";
                 LOGGER.info(elementName + ":" + value);
             }
-        } catch (final TimeoutException ele) {
+        } catch (final org.openqa.selenium.TimeoutException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
     public static void clearTextField(final WebDriver driver, final WebElement webElement, final String inputValue) {
-        final WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         try {
-            driverWait.until(ExpectedConditions.visibilityOf(webElement));
+            waitForElement(driver,webElement);
             webElement.sendKeys(Keys.CONTROL, Keys.chord("a"));
             webElement.sendKeys(Keys.BACK_SPACE);
-        } catch (TimeoutException | NoSuchElementException ele) {
+        } catch (org.openqa.selenium.TimeoutException | NoSuchElementException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
     }
 
@@ -1376,13 +1376,12 @@ public class SeleniumUtil_New {
      * -------------------------------Returns list of weblements using the by condition passed
      */
     public static List<WebElement> getListOfElements(final WebDriver driver, final By by) {
-        final WebDriverWait driverWait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
         try {
-            driverWait.until(ExpectedConditions.presenceOfElementLocated(by));
+           waitForElements(driver,by);
             Thread.sleep(3000);
-        } catch (TimeoutException | InterruptedException ele) {
+        } catch (org.openqa.selenium.TimeoutException | InterruptedException ele) {
             LOGGER.error(ERROR_MSG, ele);
-            Assertions.fail();
+            fail();
         }
         List<WebElement> ls = driver.findElements(by);
         return ls;
@@ -1448,7 +1447,32 @@ public class SeleniumUtil_New {
         return wait.until(ExpectedConditions.visibilityOf(element));
     }
 
-    public static void waitByTime(int time) {
+    public static WebElement waitForElementPresence(final WebDriver driver, final String Xpath) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
+        return wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(Xpath)));
+    }
+
+    public static Boolean waitForElementNotPresence(final WebDriver driver, final String Xpath) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
+        return wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(Xpath)));
+    }
+
+    public static Boolean waitForElementNotPresence(final WebDriver driver, final String Xpath, int time) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(time));
+        return wait.until(ExpectedConditions.invisibilityOfElementLocated(By.xpath(Xpath)));
+    }
+
+    public static List<WebElement> waitForElements(final WebDriver driver, final List<WebElement> webElements) {
+        final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
+        return wait.until(ExpectedConditions.visibilityOfAllElements(webElements));
+    }
+
+  public static Boolean waitForElementInvisible(final WebDriver driver, final WebElement element) {
+    final WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(DRIVER_WAIT_TIME_IN_SECS));
+    return wait.until(ExpectedConditions.invisibilityOf(element));
+  }
+
+   public static void waitByTime(int time) {
         try {
             Thread.sleep(time);
         } catch (Exception e) {
