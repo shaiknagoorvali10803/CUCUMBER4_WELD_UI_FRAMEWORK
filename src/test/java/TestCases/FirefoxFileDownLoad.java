@@ -1,21 +1,15 @@
 package TestCases;
 
-import Utils.SeleniumUtil_New;
-import Utils.WebDriverProvider;
+import Utils.SeleniumUtil;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.HashMap;
 
 @Singleton
 public class FirefoxFileDownLoad {
@@ -45,9 +39,9 @@ public class FirefoxFileDownLoad {
         firefoxOptions.addArguments("--private");
         WebDriver driver = new FirefoxDriver(firefoxOptions);
         driver.get("http://www.seleniumhq.org/download/");
-        SeleniumUtil_New.waitForElement(driver, driver.findElement(By.linkText("32 bit Windows IE")));
+        SeleniumUtil.waitForElement(driver, driver.findElement(By.linkText("32 bit Windows IE")));
         driver.findElement(By.linkText("32 bit Windows IE")).click();
-        SeleniumUtil_New.waitByTime(5000);
+        SeleniumUtil.waitByTime(5000);
         driver.close();
     }
 }

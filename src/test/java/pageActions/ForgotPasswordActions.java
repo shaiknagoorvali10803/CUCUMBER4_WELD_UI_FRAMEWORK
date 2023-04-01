@@ -1,6 +1,6 @@
 package pageActions;
 
-import Utils.SeleniumUtil_New;
+import Utils.SeleniumUtil;
 import Utils.WebDriverProvider;
 import org.openqa.selenium.support.PageFactory;
 import pageobjects.ForgotPasswordLocators;
@@ -20,7 +20,7 @@ public class ForgotPasswordActions {
       PageFactory.initElements(driverProvider.getInstance(),forgotPasswordLocators);
     }
     public String getForgotPasswordPageText() {
-        return SeleniumUtil_New.getValueByElement(driverProvider.getInstance(),  forgotPasswordLocators.ForgotPasswordHeading);
+        return SeleniumUtil.getValueByElement(driverProvider.getInstance(),  forgotPasswordLocators.ForgotPasswordHeading);
                 //forgotPasswordLocators.ForgotPasswordHeading.getText();
     }
 }

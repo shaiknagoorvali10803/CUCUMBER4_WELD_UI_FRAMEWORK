@@ -1,7 +1,7 @@
 package pageActions;
 
 
-import Utils.SeleniumUtil_New;
+import Utils.SeleniumUtil;
 import Utils.WebDriverProvider;
 import org.openqa.selenium.support.PageFactory;
 import pageobjects.HomePageLocators;
@@ -24,8 +24,8 @@ public class HomePageActions {
     }
 
     public String getHomePageText() {
-        System.out.println("HomePage Text is : " + SeleniumUtil_New.getValueByElement(driverProvider.getInstance(), homePageLocators.homePageUserName));
-        SeleniumUtil_New.waitForElement(driverProvider.getInstance(), homePageLocators.homePageUserName, 30);
+        System.out.println("HomePage Text is : " + SeleniumUtil.getValueByElement(driverProvider.getInstance(), homePageLocators.homePageUserName));
+        SeleniumUtil.waitForElement(driverProvider.getInstance(), homePageLocators.homePageUserName, 30);
         return homePageLocators.homePageUserName.getText();
     }
 

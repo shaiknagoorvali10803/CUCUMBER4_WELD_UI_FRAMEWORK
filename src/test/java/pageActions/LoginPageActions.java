@@ -1,6 +1,6 @@
 package pageActions;
 
-import Utils.SeleniumUtil_New;
+import Utils.SeleniumUtil;
 import Utils.WebDriverProvider;
 import org.openqa.selenium.support.PageFactory;
 import pageobjects.LoginPageLocators;
@@ -23,36 +23,36 @@ public class LoginPageActions {
     }
 
     public void setUserName(String strUserName) {
-        SeleniumUtil_New.setValueToElement(driverProvider.getInstance(), loginPageLocators.userName, strUserName);
+        SeleniumUtil.setValueToElement(driverProvider.getInstance(), loginPageLocators.userName, strUserName);
     }
 
     public void setPassword(String strPassword) {
-        SeleniumUtil_New.setValueToElement(driverProvider.getInstance(), loginPageLocators.password, strPassword);
+        SeleniumUtil.setValueToElement(driverProvider.getInstance(), loginPageLocators.password, strPassword);
     }
 
     public void clickLogin() {
-        SeleniumUtil_New.clickElementbyWebElement(driverProvider.getInstance(), loginPageLocators.login);
+        SeleniumUtil.clickElementbyWebElement(driverProvider.getInstance(), loginPageLocators.login);
     }
 
     public String getLoginTitle() {
-        return SeleniumUtil_New.getValueByElement(driverProvider.getInstance(), loginPageLocators.titleText);
+        return SeleniumUtil.getValueByElement(driverProvider.getInstance(), loginPageLocators.titleText);
     }
 
     public String getErrorMessage() {
-        return SeleniumUtil_New.getValueByElement(driverProvider.getInstance(), loginPageLocators.errorMessage);
+        return SeleniumUtil.getValueByElement(driverProvider.getInstance(), loginPageLocators.errorMessage);
     }
 
     public Boolean getLinkedInIcon() {
-        return SeleniumUtil_New.isElementDisplayed(loginPageLocators.linkedInIcon);
+        return SeleniumUtil.isElementDisplayed(loginPageLocators.linkedInIcon);
     }
 
     public Boolean getFaceBookIcon() {
-        return SeleniumUtil_New.isElementDisplayed(loginPageLocators.faceBookIcon);
+        return SeleniumUtil.isElementDisplayed(loginPageLocators.faceBookIcon);
 
     }
 
     public void clickOnForgetYourPasswordLink() {
-        SeleniumUtil_New.clickElementbyWebElement(driverProvider.getInstance(), loginPageLocators.ForgotYourPasswordLink);
+        SeleniumUtil.clickElementbyWebElement(driverProvider.getInstance(), loginPageLocators.ForgotYourPasswordLink);
 
     }
 

@@ -1,6 +1,6 @@
 package TestCases;
 
-import Utils.SeleniumUtil_New;
+import Utils.SeleniumUtil;
 import Utils.WebDriverProvider;
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -8,7 +8,6 @@ import org.openqa.selenium.PageLoadStrategy;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.chromium.ChromiumDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import javax.inject.Inject;
@@ -48,9 +47,9 @@ public class ChromeFileDownLoad {
 
         WebDriver driver = new ChromeDriver(chromeOptions);
         driver.get("http://www.seleniumhq.org/download/");
-        SeleniumUtil_New.waitForElement(driver, driver.findElement(By.linkText("32 bit Windows IE")));
+        SeleniumUtil.waitForElement(driver, driver.findElement(By.linkText("32 bit Windows IE")));
         driver.findElement(By.linkText("32 bit Windows IE")).click();
-        SeleniumUtil_New.waitByTime(5000);
+        SeleniumUtil.waitByTime(5000);
         driver.close();
     }
 }
