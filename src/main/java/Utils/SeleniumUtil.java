@@ -1409,6 +1409,24 @@ public class SeleniumUtil {
      * ***************************************************************************
      */
 
+    /**
+     * -------------------------------Return the BGColor of the element in terms of Hexa Decimal Value --------------------------------------
+     */
+
+    public static String getElementBGColor(final WebDriver driver, final WebElement element){
+        String color = element.getCssValue("background-color");
+        String[] hexValue = color.replace("rgba(", "").replace(")", "").split(",");
+        hexValue[0] = hexValue[0].trim();
+        int hexValue1 = Integer.parseInt(hexValue[0]);
+        hexValue[1] = hexValue[1].trim();
+        int hexValue2 = Integer.parseInt(hexValue[1]);
+        hexValue[2] = hexValue[2].trim();
+        int hexValue3 = Integer.parseInt(hexValue[2]);
+        String actualColor = String.format("#%02x%02x%02x", hexValue1, hexValue2, hexValue3);
+        System.err.println("BGColor is :" + actualColor);
+        return actualColor;
+    }
+
 
     /**
      * -------------------------------wait methods --------------------------------------
